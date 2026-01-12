@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rob's List - 300 Things to Do Before I Die</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .total-count {
+            font-size: 1.5em;
+            opacity: 0.9;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid;
+        }
+
+        .category-icon {
+            font-size: 2.5em;
+        }
+
+        .category-title {
+            flex: 1;
+        }
+
+        .category-title h2 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .add-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .add-input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .add-btn {
+            padding: 12px 20px;
+            background: #d4af37;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #b8941f;
+        }
+
+        .items-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+
+        .item:hover {
+            background: #e9ecef;
+        }
+
+        .item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .item-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #e84118;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Category colors with gold and dark blue theme */
+        .money { border-color: #d4af37; }
+        .money .category-header { border-color: #d4af37; }
+        
+        .family { border-color: #1e3c72; }
+        .family .category-header { border-color: #1e3c72; }
+        
+        .travel { border-color: #3498db; }
+        .travel .category-header { border-color: #3498db; }
+        
+        .career { border-color: #d4af37; }
+        .career .category-header { border-color: #d4af37; }
+        
+        .social { border-color: #2a5298; }
+        .social .category-header { border-color: #2a5298; }
+        
+        .health { border-color: #1abc9c; }
+        .health .category-header { border-color: #1abc9c; }
+        
+        .personal { border-color: #d4af37; }
+        .personal .category-header { border-color: #d4af37; }
+        
+        .kids { border-color: #1e3c72; }
+        .kids .category-header { border-color: #1e3c72; }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Rob's List</h1>
+            <div class="total-count">Total: <span id="totalCount">0</span> / 300</div>
+        </header>
+
+        <div class="categories-grid" id="categoriesGrid"></div>
+    </div>
+
+    <script>
+        const categories = [
+            { id: 'money', name: 'Money & Assets', icon: '💰', color: '#d4af37' },
+            { id: 'family', name: 'Family & Relationships', icon: '❤️', color: '#1e3c72' },
+            { id: 'travel', name: 'Travel & Explore', icon: '✈️', color: '#3498db' },
+            { id: 'career', name: 'Career & Business', icon: '💼', color: '#d4af37' },
+            { id: 'social', name: 'Social & Community', icon: '🤝', color: '#2a5298' },
+            { id: 'health', name: 'Health & Fitness', icon: '💪', color: '#1abc9c' },
+            { id: 'personal', name: 'Personal Development', icon: '📚', color: '#d4af37' },
+            { id: 'kids', name: 'Kids', icon: '👶', color: '#1e3c72' }
+        ];
+
+        let bucketList = {};
+
+        // Initialize storage with unique keys for Rob
+        async function init() {
+            try {
+                for (const cat of categories) {
+                    const result = await window.storage.get(`rob-bucket-${cat.id}`);
+                    bucketList[cat.id] = result ? JSON.parse(result.value) : [];
+                }
+            } catch (error) {
+                categories.forEach(cat => {
+                    bucketList[cat.id] = [];
+                });
+            }
+            renderCategories();
+            updateTotalCount();
+        }
+
+        async function saveCategory(categoryId) {
+            try {
+                await window.storage.set(`rob-bucket-${categoryId}`, JSON.stringify(bucketList[categoryId]));
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = categories.map(cat => `
+                <div class="category-card ${cat.id}">
+                    <div class="category-header">
+                        <div class="category-icon">${cat.icon}</div>
+                        <div class="category-title">
+                            <h2>${cat.name}</h2>
+                            <div class="category-count">${bucketList[cat.id].length} items</div>
+                        </div>
+                    </div>
+                    <div class="add-form">
+                        <input type="text" 
+                               class="add-input" 
+                               placeholder="Add new item..." 
+                               id="input-${cat.id}"
+                               onkeypress="handleKeyPress(event, '${cat.id}')">
+                        <button class="add-btn" onclick="addItem('${cat.id}')">+</button>
+                    </div>
+                    <ul class="items-list" id="list-${cat.id}">
+                        ${renderItems(cat.id)}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function renderItems(categoryId) {
+            const items = bucketList[categoryId];
+            if (items.length === 0) {
+                return '<div class="empty-state">No items yet. Start adding your goals!</div>';
+            }
+            return items.map((item, index) => `
+                <li class="item ${item.completed ? 'completed' : ''}">
+                    <input type="checkbox" 
+                           class="item-checkbox" 
+                           ${item.completed ? 'checked' : ''}
+                           onchange="toggleComplete('${categoryId}', ${index})">
+                    <span class="item-text">${item.text}</span>
+                    <button class="delete-btn" onclick="deleteItem('${categoryId}', ${index})">×</button>
+                </li>
+            `).join('');
+        }
+
+        function handleKeyPress(event, categoryId) {
+            if (event.key === 'Enter') {
+                addItem(categoryId);
+            }
+        }
+
+        async function addItem(categoryId) {
+            const input = document.getElementById(`input-${categoryId}`);
+            const text = input.value.trim();
+            
+            if (text === '') return;
+
+            bucketList[categoryId].push({
+                text: text,
+                completed: false,
+                addedAt: new Date().toISOString()
+            });
+
+            await saveCategory(categoryId);
+            
+            input.value = '';
+            document.getElementById(`list-${categoryId}`).innerHTML = renderItems(categoryId);
+            updateCategoryCount(categoryId);
+            updateTotalCount();
+        }
+
+        async function deleteItem(categoryId, index) {
+            bucketList[categoryId].splice(index, 1);
+            await saveCategory(categoryId);
+            document.getElementById(`list-${categoryId}`).innerHTML = renderItems(categoryId);
+            updateCategoryCount(categoryId);
+            updateTotalCount();
+        }
+
+        async function toggleComplete(categoryId, index) {
+            bucketList[categoryId][index].completed = !bucketList[categoryId][index].completed;
+            await saveCategory(categoryId);
+            document.getElementById(`list-${categoryId}`).innerHTML = renderItems(categoryId);
+        }
+
+        function updateCategoryCount(categoryId) {
+            const card = document.querySelector(`.${categoryId} .category-count`);
+            card.textContent = `${bucketList[categoryId].length} items`;
+        }
+
+        function updateTotalCount() {
+            const total = Object.values(bucketList).reduce((sum, items) => sum + items.length, 0);
+            document.getElementById('totalCount').textContent = total;
+        }
+
+        init();
+    </script>
+</body>
+</html>
